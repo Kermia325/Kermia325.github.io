@@ -1,5 +1,13 @@
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
 
-export const SITE_TITLE = 'Astro Blog';
-export const SITE_DESCRIPTION = 'Welcome to my website!';
+// 集中管理站点基础信息，后续可直接在这里修改。
+export const SITE_TITLE = 'Kermia 的个人博客';
+export const SITE_DESCRIPTION = '记录学习、技术探索与日常生活的个人空间';
+export const SITE_AUTHOR = 'Kermia';
+
+export const NAV_ITEMS = [
+	{ href: '/', label: '首页' },
+	{ href: '/blog', label: '文章' },
+	{ href: '/about', label: '关于' },
+];
