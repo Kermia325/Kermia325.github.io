@@ -1,0 +1,352 @@
+---
+import { MUSIC_FILE, MUSIC_TITLE } from '../consts';
+
+const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
+---
+
+<aside class="music-player is-collapsed" aria-label="背景音乐播放器">
+	<audio id="background-music" preload="metadata" src={musicSrc}></audio>
+	<button id="music-expand" class="collapse-trigger" type="button" aria-label="展开音乐播放器" aria-expanded="false" title="展开音乐播放器">
+		<span aria-hidden="true">♫</span>
+	</button>
+
+	<div class="player-heading">
+		<span class="music-note" aria-hidden="true">♫</span>
+		<div>
+			<p class="brand">Kermia Radio</p>
+			<p class="playlist">个人播放列表</p>
+		</div>
+	</div>
+
+	<div class="track-details">
+		<div class="record-cover" aria-hidden="true">
+			<div class="record-label">K</div>
+		</div>
+		<div class="track-copy">
+			<p class="music-label">正在播放</p>
+			<strong>{MUSIC_TITLE}</strong>
+			<span id="music-status" class="music-status">正在尝试自动播放</span>
+		</div>
+	</div>
+
+	<div class="progress-section">
+		<div class="progress-meta">
+			<span>播放进度</span>
+			<span><time id="current-time">00:00</time> / <time id="duration">00:00</time></span>
+		</div>
+		<input id="progress" type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度" />
+	</div>
+
+	<div class="player-controls">
+		<button class="secondary-control" type="button" disabled aria-label="没有上一首歌曲" title="没有上一首歌曲">|◀</button>
+		<button id="music-toggle" class="play-control" type="button" aria-label="播放音乐" title="播放音乐">
+			<span id="play-icon" aria-hidden="true">▶</span>
+		</button>
+		<button class="secondary-control" type="button" disabled aria-label="没有下一首歌曲" title="没有下一首歌曲">▶|</button>
+		<label class="volume-control">
+			<span>音量</span>
+			<input id="volume" type="range" min="0" max="1" value="1" step="0.05" aria-label="音量" />
+		</label>
+	</div>
+</aside>
+
+<script>
+	const audio = document.querySelector<HTMLAudioElement>('#background-music');
+	const player = document.querySelector<HTMLElement>('.music-player');
+	const expandButton = document.querySelector<HTMLButtonElement>('#music-expand');
+	const button = document.querySelector<HTMLButtonElement>('#music-toggle');
+	const playIcon = document.querySelector<HTMLElement>('#play-icon');
+	const status = document.querySelector<HTMLElement>('#music-status');
+	const progress = document.querySelector<HTMLInputElement>('#progress');
+	const currentTime = document.querySelector<HTMLElement>('#current-time');
+	const duration = document.querySelector<HTMLElement>('#duration');
+	const volume = document.querySelector<HTMLInputElement>('#volume');
+
+	if (audio && player && expandButton && button && playIcon && status && progress && currentTime && duration && volume) {
+		const setCollapsed = (isCollapsed: boolean) => {
+			player.classList.toggle('is-collapsed', isCollapsed);
+			expandButton.setAttribute('aria-expanded', String(!isCollapsed));
+			expandButton.setAttribute('aria-label', isCollapsed ? '展开音乐播放器' : '收起音乐播放器');
+			expandButton.setAttribute('title', isCollapsed ? '展开音乐播放器' : '收起音乐播放器');
+			expandButton.querySelector('span')!.textContent = isCollapsed ? '♫' : '‹';
+		};
+
+		expandButton.addEventListener('click', () => {
+			setCollapsed(!player.classList.contains('is-collapsed'));
+		});
+
+		const formatTime = (seconds: number) => {
+			if (!Number.isFinite(seconds)) return '00:00';
+			const minutes = Math.floor(seconds / 60);
+			const remainingSeconds = Math.floor(seconds % 60)
+				.toString()
+				.padStart(2, '0');
+			return `${minutes.toString().padStart(2, '0')}:${remainingSeconds}`;
+		};
+
+		const updateControl = (isPlaying: boolean) => {
+			playIcon.textContent = isPlaying ? 'Ⅱ' : '▶';
+			button.setAttribute('aria-label', isPlaying ? '暂停音乐' : '播放音乐');
+			button.setAttribute('title', isPlaying ? '暂停音乐' : '播放音乐');
+			status.textContent = isPlaying ? '正在播放' : '已暂停';
+			player.classList.toggle('is-playing', isPlaying);
+		};
+
+		const updateProgress = () => {
+			currentTime.textContent = formatTime(audio.currentTime);
+			progress.value = audio.duration ? String((audio.currentTime / audio.duration) * 100) : '0';
+		};
+
+		const playMusic = async () => {
+			try {
+				await audio.play();
+			} catch {
+				status.textContent = '点击播放以开始音乐';
+			}
+		};
+
+		button.addEventListener('click', () => {
+			if (audio.paused) void playMusic();
+			else audio.pause();
+		});
+
+		progress.addEventListener('input', () => {
+			if (audio.duration) audio.currentTime = (Number(progress.value) / 100) * audio.duration;
+		});
+
+		volume.addEventListener('input', () => {
+			audio.volume = Number(volume.value);
+		});
+
+		audio.addEventListener('loadedmetadata', () => {
+			duration.textContent = formatTime(audio.duration);
+			updateProgress();
+		});
+		audio.addEventListener('timeupdate', updateProgress);
+		audio.addEventListener('pause', () => updateControl(false));
+		audio.addEventListener('play', () => updateControl(true));
+		audio.addEventListener('ended', () => {
+			status.textContent = '播放结束';
+			updateProgress();
+		});
+		audio.addEventListener('error', () => {
+			status.textContent = '音乐文件无法播放';
+		});
+
+		window.addEventListener('load', () => void playMusic(), { once: true });
+	}
+</script>
+
+<style>
+	.music-player {
+		position: fixed;
+		z-index: 10;
+		top: 50%;
+		left: 1rem;
+		width: min(23rem, calc(100vw - 2.5rem));
+		padding: 1.25rem;
+		border: 1px solid rgba(194, 210, 226, 0.7);
+		border-radius: 1rem;
+		background:
+			radial-gradient(circle at 100% 0, rgba(255, 231, 242, 0.55), transparent 35%),
+			rgba(255, 255, 255, 0.93);
+		box-shadow: 0 12px 32px rgba(77, 111, 143, 0.18);
+		backdrop-filter: blur(10px);
+		transform: translateY(-50%);
+		transition: width 0.25s ease, height 0.25s ease, padding 0.25s ease, border-radius 0.25s ease;
+	}
+	.music-player.is-collapsed {
+		width: 3.25rem;
+		height: 3.25rem;
+		padding: 0;
+		border-radius: 0 0.9rem 0.9rem 0;
+	}
+	.music-player.is-collapsed > :not(.collapse-trigger) {
+		display: none;
+	}
+	.collapse-trigger {
+		position: absolute;
+		top: 0.65rem;
+		right: 0.65rem;
+		display: grid;
+		width: 1.8rem;
+		height: 1.8rem;
+		place-items: center;
+		border: 0;
+		border-radius: 50%;
+		background: #fbe8f2;
+		color: #5d7897;
+		font-size: 1.05rem;
+		cursor: pointer;
+	}
+	.music-player.is-collapsed .collapse-trigger {
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: inherit;
+		background: transparent;
+		font-size: 1.35rem;
+	}
+	.collapse-trigger:hover,
+	.collapse-trigger:focus-visible {
+		background: #f4d8e7;
+	}
+	.player-heading,
+	.track-details,
+	.progress-meta,
+	.player-controls {
+		display: flex;
+		align-items: center;
+	}
+	.player-heading {
+		gap: 0.65rem;
+		margin-bottom: 1.15rem;
+	}
+	.music-note {
+		display: grid;
+		width: 2.4rem;
+		height: 2.4rem;
+		place-items: center;
+		border-radius: 50%;
+		background: #fbe8f2;
+		color: #5d7897;
+		font-size: 1.2rem;
+	}
+	.brand,
+	.playlist,
+	.music-label,
+	.music-status {
+		margin: 0;
+	}
+	.brand {
+		color: #41516d;
+		font-size: 1rem;
+		font-weight: 700;
+	}
+	.playlist,
+	.music-label,
+	.music-status,
+	.progress-meta {
+		color: #71809a;
+		font-size: 0.72rem;
+	}
+	.track-details {
+		gap: 1rem;
+		margin-bottom: 1.2rem;
+	}
+	.record-cover {
+		position: relative;
+		display: grid;
+		width: 5.5rem;
+		height: 5.5rem;
+		flex: 0 0 auto;
+		place-items: center;
+		border: 4px solid #e2eaf2;
+		border-radius: 0.75rem;
+		background: #f7faff;
+		box-shadow: inset 0 0 0 1px #c8d5e3, 0 4px 0 #d6e2ef;
+	}
+	.record-cover::before {
+		display: block;
+		width: 4.5rem;
+		height: 4.5rem;
+		border-radius: 50%;
+		background: repeating-radial-gradient(circle, #1d2632 0 1px, #111a25 2px 4px, #273240 5px 6px);
+		box-shadow: 0 2px 5px rgba(38, 53, 71, 0.4);
+		content: '';
+	}
+	.music-player.is-playing .record-cover::before {
+		animation: spin 4s linear infinite;
+	}
+	.record-label {
+		position: absolute;
+		z-index: 1;
+		display: grid;
+		width: 1.4rem;
+		height: 1.4rem;
+		place-items: center;
+		border-radius: 50%;
+		background: #f7b7d1;
+		color: #6a4a69;
+		font-size: 0.7rem;
+		font-weight: 700;
+	}
+	.track-copy {
+		min-width: 0;
+	}
+	.track-copy strong {
+		display: block;
+		overflow: hidden;
+		margin: 0.2rem 0;
+		color: #41516d;
+		font-size: 0.95rem;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.progress-section {
+		padding: 0.8rem 0;
+		border-top: 1px solid #e6edf4;
+		border-bottom: 1px solid #e6edf4;
+	}
+	.progress-meta {
+		justify-content: space-between;
+		margin-bottom: 0.45rem;
+	}
+	input[type='range'] {
+		width: 100%;
+		accent-color: #668eaf;
+		cursor: pointer;
+	}
+	.player-controls {
+		gap: 0.55rem;
+		padding-top: 1rem;
+	}
+	button {
+		display: grid;
+		place-items: center;
+		border: 1px solid #d7e3ee;
+		border-radius: 0.55rem;
+		background: white;
+		color: #668eaf;
+		cursor: pointer;
+	}
+	button:disabled {
+		cursor: not-allowed;
+		opacity: 0.45;
+	}
+	.secondary-control {
+		width: 2.7rem;
+		height: 2.7rem;
+		font-size: 0.8rem;
+	}
+	.play-control {
+		width: 3.1rem;
+		height: 3.1rem;
+		border-color: #668eaf;
+		background: #668eaf;
+		color: white;
+		font-size: 1rem;
+	}
+	.play-control:hover,
+	.play-control:focus-visible {
+		background: #4d7698;
+	}
+	.volume-control {
+		display: grid;
+		flex: 1;
+		gap: 0.15rem;
+		margin-left: 0.3rem;
+		color: #71809a;
+		font-size: 0.72rem;
+	}
+	@media (max-width: 480px) {
+		.music-player {
+			left: 0.5rem;
+		}
+	}
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+</style>

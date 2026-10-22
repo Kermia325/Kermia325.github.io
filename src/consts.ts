@@ -5,6 +5,8 @@
 export const SITE_TITLE = 'Kermia 的个人博客';
 export const SITE_DESCRIPTION = '记录学习、技术探索与日常生活的个人空间';
 export const SITE_AUTHOR = 'Kermia';
+export const MUSIC_TITLE = 'sumimi《Here, the world!》';
+export const MUSIC_FILE = 'audio/here-the-world.mp3';
 
 export const NAV_ITEMS = [
 	{ href: '/', label: '首页' },

@@ -1,5 +1,6 @@
 ---
 import { SITE_AUTHOR, SITE_TITLE } from '../consts';
+import MusicPlayer from './MusicPlayer.astro';
 
 const today = new Date();
 ---
@@ -8,6 +9,8 @@ const today = new Date();
 	<p>{SITE_TITLE}</p>
 	<p>&copy; {today.getFullYear()} {SITE_AUTHOR}. 保留所有权利。</p>
 </footer>
+
+<MusicPlayer />
 
 <style>
 	footer {
