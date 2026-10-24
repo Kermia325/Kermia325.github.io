@@ -8,6 +8,12 @@ export const SITE_AUTHOR = 'Kermia';
 export const MUSIC_TITLE = 'sumimi《Here, the world!》';
 export const MUSIC_FILE = 'audio/here-the-world.mp3';
 
+// 首页背景素材：填入 public 目录下的路径后会自动替换当前的渐变占位背景。
+export const HOME_ARTWORK = {
+	desktop: '',
+	mobile: '',
+};
+
 export const NAV_ITEMS = [
 	{ href: '/', label: '首页' },
 	{ href: '/blog', label: '文章' },

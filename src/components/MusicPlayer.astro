@@ -63,6 +63,8 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	const volume = document.querySelector<HTMLInputElement>('#volume');
 
 	if (audio && player && expandButton && button && playIcon && status && progress && currentTime && duration && volume) {
+		let collapseTimer: ReturnType<typeof setTimeout> | undefined;
+
 		const setCollapsed = (isCollapsed: boolean) => {
 			player.classList.toggle('is-collapsed', isCollapsed);
 			expandButton.setAttribute('aria-expanded', String(!isCollapsed));
@@ -73,6 +75,15 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 
 		expandButton.addEventListener('click', () => {
 			setCollapsed(!player.classList.contains('is-collapsed'));
+		});
+
+		player.addEventListener('pointerenter', () => {
+			if (collapseTimer) clearTimeout(collapseTimer);
+			setCollapsed(false);
+		});
+
+		player.addEventListener('pointerleave', () => {
+			collapseTimer = setTimeout(() => setCollapsed(true), 180);
 		});
 
 		const formatTime = (seconds: number) => {
@@ -141,16 +152,16 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	.music-player {
 		position: fixed;
 		z-index: 10;
-		top: 50%;
+		top: 43%;
 		left: 1rem;
 		width: min(23rem, calc(100vw - 2.5rem));
 		padding: 1.25rem;
-		border: 1px solid rgba(194, 210, 226, 0.7);
+		border: 1px solid rgba(201, 216, 228, 0.82);
 		border-radius: 1rem;
 		background:
-			radial-gradient(circle at 100% 0, rgba(255, 231, 242, 0.55), transparent 35%),
-			rgba(255, 255, 255, 0.93);
-		box-shadow: 0 12px 32px rgba(77, 111, 143, 0.18);
+			radial-gradient(circle at 100% 0, rgba(247, 217, 230, 0.72), transparent 35%),
+			rgba(255, 252, 249, 0.94);
+		box-shadow: 0 12px 32px rgba(73, 103, 132, 0.18);
 		backdrop-filter: blur(10px);
 		transform: translateY(-50%);
 		transition: width 0.25s ease, height 0.25s ease, padding 0.25s ease, border-radius 0.25s ease;
@@ -174,8 +185,8 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		place-items: center;
 		border: 0;
 		border-radius: 50%;
-		background: #fbe8f2;
-		color: #5d7897;
+		background: #f7d9e6;
+		color: #557797;
 		font-size: 1.05rem;
 		cursor: pointer;
 	}
@@ -189,7 +200,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	}
 	.collapse-trigger:hover,
 	.collapse-trigger:focus-visible {
-		background: #f4d8e7;
+		background: #f1c8da;
 	}
 	.player-heading,
 	.track-details,
@@ -208,8 +219,8 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		height: 2.4rem;
 		place-items: center;
 		border-radius: 50%;
-		background: #fbe8f2;
-		color: #5d7897;
+		background: #f7d9e6;
+		color: #557797;
 		font-size: 1.2rem;
 	}
 	.brand,
@@ -219,7 +230,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		margin: 0;
 	}
 	.brand {
-		color: #41516d;
+		color: #4a617c;
 		font-size: 1rem;
 		font-weight: 700;
 	}
@@ -227,7 +238,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	.music-label,
 	.music-status,
 	.progress-meta {
-		color: #71809a;
+		color: #71869e;
 		font-size: 0.72rem;
 	}
 	.track-details {
@@ -241,9 +252,9 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		height: 5.5rem;
 		flex: 0 0 auto;
 		place-items: center;
-		border: 4px solid #e2eaf2;
+		border: 4px solid #e5edf2;
 		border-radius: 0.75rem;
-		background: #f7faff;
+		background: #fbf8f4;
 		box-shadow: inset 0 0 0 1px #c8d5e3, 0 4px 0 #d6e2ef;
 	}
 	.record-cover::before {
@@ -266,8 +277,8 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		height: 1.4rem;
 		place-items: center;
 		border-radius: 50%;
-		background: #f7b7d1;
-		color: #6a4a69;
+		background: #f1bfd4;
+		color: #765468;
 		font-size: 0.7rem;
 		font-weight: 700;
 	}
@@ -278,7 +289,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		display: block;
 		overflow: hidden;
 		margin: 0.2rem 0;
-		color: #41516d;
+		color: #4a617c;
 		font-size: 0.95rem;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -294,7 +305,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	}
 	input[type='range'] {
 		width: 100%;
-		accent-color: #668eaf;
+		accent-color: #5f809d;
 		cursor: pointer;
 	}
 	.player-controls {
@@ -304,10 +315,10 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	button {
 		display: grid;
 		place-items: center;
-		border: 1px solid #d7e3ee;
+		border: 1px solid #d8e3ec;
 		border-radius: 0.55rem;
 		background: white;
-		color: #668eaf;
+		color: #5f809d;
 		cursor: pointer;
 	}
 	button:disabled {
@@ -322,14 +333,14 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	.play-control {
 		width: 3.1rem;
 		height: 3.1rem;
-		border-color: #668eaf;
-		background: #668eaf;
+		border-color: #5f809d;
+		background: #5f809d;
 		color: white;
 		font-size: 1rem;
 	}
 	.play-control:hover,
 	.play-control:focus-visible {
-		background: #4d7698;
+		background: #456b8d;
 	}
 	.volume-control {
 		display: grid;
