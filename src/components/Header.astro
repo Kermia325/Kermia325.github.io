@@ -1,16 +1,29 @@
 ---
 import { NAV_ITEMS, SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+
+const details = [
+	{ caption: 'front page', icon: 'M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9' },
+	{ caption: 'notes', icon: 'M5 3h14v18H5zM8 7h8M8 11h8M8 15h5' },
+	{ caption: 'profile', icon: 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2' },
+];
 ---
 
 <header>
 	<nav aria-label="主导航">
 		<a class="site-mark" href="/" aria-label={`返回${SITE_TITLE}首页`}>
 			<span class="site-mark__badge" aria-hidden="true">K</span>
-			<span class="site-mark__name">Kermia<br /><small>personal diary</small></span>
+			<span class="site-mark__name">Kermia</span>
 		</a>
 		<div class="internal-links">
-			{NAV_ITEMS.map((item) => <HeaderLink href={item.href}>{item.label}</HeaderLink>)}
+			{NAV_ITEMS.map((item, index) => (
+				<HeaderLink href={item.href}>
+					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d={details[index].icon} />
+					</svg>
+					<span class="nav-label">{item.label}<small>{details[index].caption}</small></span>
+				</HeaderLink>
+			))}
 		</div>
 	</nav>
 </header>
@@ -21,27 +34,25 @@ import HeaderLink from './HeaderLink.astro';
 		z-index: 8;
 		top: 0;
 		padding: 0.7rem clamp(1rem, 4vw, 3rem);
-		border-bottom: 1px solid rgba(168, 190, 207, 0.46);
-		background: rgba(255, 252, 249, 0.78);
-		box-shadow: 0 0.4rem 1.4rem rgba(86, 101, 126, 0.08);
-		backdrop-filter: blur(14px);
-	}
-	nav,
-	.site-mark,
-	.internal-links {
-		display: flex;
-		align-items: center;
+		pointer-events: none;
 	}
 	nav {
-		justify-content: space-between;
-		gap: 1.5rem;
+		display: grid;
+		grid-template-columns: 1fr;
+		min-height: 64px;
+		align-items: center;
+		gap: 1rem;
 		max-width: 82rem;
 		margin: auto;
 	}
+	.site-mark, .internal-links { pointer-events: auto; }
 	.site-mark {
+		display: flex;
+		align-items: center;
+		justify-self: start;
 		gap: 0.55rem;
-		color: #526f8d;
-		line-height: 1;
+		color: #68517d;
+		line-height: 1.25;
 		text-decoration: none;
 	}
 	.site-mark__badge {
@@ -49,60 +60,64 @@ import HeaderLink from './HeaderLink.astro';
 		width: 2.15rem;
 		height: 2.15rem;
 		place-items: center;
-		border-radius: 0.7rem 0.9rem 0.7rem 0.9rem;
-		background: #f7d9e6;
-		box-shadow: 0.16rem 0.16rem 0 #d9e5ee;
-		color: #557797;
+		border-radius: 0.7rem 0.9rem;
+		background: #e8dff1;
+		box-shadow: 0.16rem 0.16rem 0 #d9cce5;
 		font-family: Georgia, serif;
 		font-size: 1.15rem;
 		font-weight: 700;
 		transform: rotate(-5deg);
 	}
-	.site-mark__name {
-		font-size: 0.9rem;
-		font-weight: 700;
-	}
-	.site-mark small {
-		color: #92a1b3;
-		font-size: 0.58rem;
-		font-weight: 400;
-		letter-spacing: 0.08em;
-	}
+	.site-mark__name { font-size: 0.9rem; font-weight: 700; white-space: nowrap; }
+	.site-mark small { color: #81738e; font-size: 0.58rem; font-weight: 400; letter-spacing: 0.08em; }
 	.internal-links {
-		gap: 0.2rem;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: max-content;
+		display: flex;
+		gap: 0.3rem;
+		padding: 0.35rem;
+		border: 1px solid rgba(214, 199, 227, 0.8);
+		border-radius: 999px;
+		background: rgba(255, 252, 255, 0.85);
+		backdrop-filter: blur(16px);
+		box-shadow: 0 8px 28px rgba(86, 65, 110, 0.1), inset 0 1px 0 white;
 	}
 	.internal-links :global(a) {
-		padding: 0.55rem 0.8rem;
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		padding: 0.5rem 1.05rem;
+		min-height: 44px;
+		box-sizing: border-box;
 		border: 1px solid transparent;
 		border-radius: 999px;
-		color: #5b718b;
-		font-size: 0.9rem;
+		color: #756582;
+		font-size: 0.85rem;
 		font-weight: 700;
 		text-decoration: none;
+		transition: background 180ms ease, box-shadow 180ms ease;
 	}
-	.internal-links :global(a:hover),
+	.nav-label { line-height: 1.15; }
+	.nav-label small { display: block; margin-top: 0.2rem; font-size: 0.55rem; font-weight: 400; color: #80728d; }
+	.internal-links :global(a:hover) { background: #f4edf8; }
 	.internal-links :global(a.active) {
-		border-color: #d4e0ea;
-		background: rgba(255, 255, 255, 0.75);
-		color: #456b8d;
+		background: linear-gradient(135deg, #fff, #eee5f6);
+		border-color: #d6c7e3;
+		color: #634679;
+		box-shadow: 0 3px 0 #dbcce8;
 	}
-	@media (max-width: 560px) {
-		header {
-			padding: 0.6rem 0.75rem;
-		}
-		nav {
-			align-items: flex-start;
-			gap: 0.5rem;
-		}
-		.site-mark__name {
-			display: none;
-		}
-		.internal-links {
-			gap: 0;
-		}
-		.internal-links :global(a) {
-			padding: 0.5rem 0.55rem;
-			font-size: 0.82rem;
-		}
+	nav :global(a:focus-visible) { outline: 2px solid #82639d; outline-offset: 4px; }
+	@media (max-width: 760px) {
+		header { padding: 0.6rem 0.75rem; }
+		nav { grid-template-columns: 1fr; gap: 0.6rem; }
+		.site-mark { display: none; }
+		.internal-links { max-width: calc(100% - 1.5rem); gap: 0.1rem; }
+		.internal-links :global(a) { padding: 0.5rem 0.85rem; gap: 0.4rem; }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.internal-links :global(a) { transition: none; }
 	}
 </style>

@@ -4,7 +4,7 @@ import { MUSIC_FILE, MUSIC_TITLE } from '../consts';
 const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 ---
 
-<aside class="music-player is-collapsed" aria-label="背景音乐播放器">
+<aside class="music-player is-collapsed" aria-label="背景音乐播放器" transition:persist="background-music-player">
 	<audio id="background-music" preload="metadata" src={musicSrc}></audio>
 	<button id="music-expand" class="collapse-trigger" type="button" aria-label="展开音乐播放器" aria-expanded="false" title="展开音乐播放器">
 		<span aria-hidden="true">♫</span>
@@ -44,7 +44,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		</button>
 		<button class="secondary-control" type="button" disabled aria-label="没有下一首歌曲" title="没有下一首歌曲">▶|</button>
 		<label class="volume-control">
-			<span>音量</span>
+			<span class="volume-meta"><span>音量</span><span id="volume-percent">100%</span></span>
 			<input id="volume" type="range" min="0" max="1" value="1" step="0.05" aria-label="音量" />
 		</label>
 	</div>
@@ -61,6 +61,7 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 	const currentTime = document.querySelector<HTMLElement>('#current-time');
 	const duration = document.querySelector<HTMLElement>('#duration');
 	const volume = document.querySelector<HTMLInputElement>('#volume');
+	const volumePercent = document.querySelector<HTMLElement>('#volume-percent');
 
 	if (audio && player && expandButton && button && playIcon && status && progress && currentTime && duration && volume) {
 		let collapseTimer: ReturnType<typeof setTimeout> | undefined;
@@ -125,9 +126,18 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 			if (audio.duration) audio.currentTime = (Number(progress.value) / 100) * audio.duration;
 		});
 
+		const updateVolume = () => {
+			const percent = `${Math.round(audio.volume * 100)}%`;
+			volume.value = String(audio.volume);
+			if (volumePercent) volumePercent.textContent = percent;
+			volume.setAttribute('aria-valuetext', percent);
+		};
 		volume.addEventListener('input', () => {
 			audio.volume = Number(volume.value);
+			updateVolume();
 		});
+		audio.addEventListener('volumechange', updateVolume);
+		updateVolume();
 
 		audio.addEventListener('loadedmetadata', () => {
 			duration.textContent = formatTime(audio.duration);
@@ -149,6 +159,14 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 </script>
 
 <style>
+	.music-player { box-sizing: border-box; max-height: 82svh; overflow-y: auto; }
+	.music-player .play-control { background: #69507f; border-color: #69507f; }
+	.music-player .collapse-trigger, .music-player .music-note { color: #69507f; background-color: #eee5f5; }
+	.music-player input[type='range'] { accent-color: #69507f; }
+	@media (prefers-reduced-motion: reduce) {
+		.music-player { transition: none !important; }
+		.music-player.is-playing .record-cover::before { animation: none !important; }
+	}
 	.music-player {
 		position: fixed;
 		z-index: 10;
@@ -349,6 +367,16 @@ const musicSrc = `${import.meta.env.BASE_URL}${MUSIC_FILE}`;
 		margin-left: 0.3rem;
 		color: #71809a;
 		font-size: 0.72rem;
+	}
+	.volume-meta {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	#volume-percent {
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
 	}
 	@media (max-width: 480px) {
 		.music-player {
