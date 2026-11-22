@@ -4,7 +4,7 @@
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
 
-/* 首页星夜主题；以 body 类限定，切换到文章／关于页时恢复原样。 */
+/* 首页、文章列表和关于页共用的星夜配色。 */
 body.night-home { background: #08091b; color: #e9def8; color-scheme: dark; --accent: #d3afff; --accent-dark: #f1dfff; }
 body.night-home > header { position: absolute; inset: 0 0 auto; background: transparent; }
 body.night-home header .site-mark { color: #f1dfff; }
@@ -24,6 +24,32 @@ body.night-home .music-player .progress-section { border-color: #6b527e66; }
 body.night-home .music-player .play-control { background: #765197; border-color: #a581c1; }
 body.night-home .music-player .secondary-control { background: #21182e; border-color: #705784; color: #b7a6cb; }
 body.night-home .music-player input[type='range'] { accent-color: #bb91e4; }
+
+/* 内页使用无人物星空，保留阅读区域和关于页留白。 */
+body.night-inner {
+	min-height: 100svh;
+	display: flex;
+	flex-direction: column;
+	background: linear-gradient(180deg, #08091b80, #08091bd9 70%, #08091b), url('/images/millsage/stellar-background.png') center top / cover no-repeat;
+}
+body.night-inner > header { position: sticky; inset: auto; top: 0; flex-shrink: 0; }
+body.night-inner > main {
+	flex: 1;
+	width: min(960px, calc(100% - 8rem));
+	max-width: none;
+	box-sizing: border-box;
+	margin: 2rem auto;
+	padding: clamp(1.5rem, 4vw, 3rem);
+	border: 1px solid #cc9df54d;
+	background: #0b0b2133;
+}
+body.night-inner .night-content { padding: 1.5rem; background: #0c0b23c9; border-left: 2px solid #ab86c9; }
+body.night-inner main h1 { color: #f3e6ff; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 500; letter-spacing: .08em; }
+body.night-inner > footer { flex-shrink: 0; background: #08091bd9; }
+@media (max-width: 720px) {
+	body.night-inner > main { width: calc(100% - 2rem); margin: 1rem auto; padding: 1rem; }
+	body.night-inner .night-content { padding: 1rem; }
+}
 
 :root {
 	--accent: #69507f;

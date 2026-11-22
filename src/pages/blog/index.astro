@@ -10,11 +10,13 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 	<head>
 		<BaseHead title={`文章 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
-	<body>
+	<body class="night-home night-inner">
 		<Header />
-		<main>
+		<main class="notes-page">
+			<div class="night-content">
 			<h1>文章</h1>
 			<p class="empty-state">暂时还没有文章，之后会在这里分享学习、技术探索与日常记录。</p>
+			</div>
 		</main>
 		<Footer />
 	</body>
@@ -23,6 +25,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 <style>
 	.empty-state {
 		max-width: 36rem;
-		color: rgb(var(--gray));
+		color: #d3c6e6;
 	}
 </style>

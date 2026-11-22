@@ -10,7 +10,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<head>
 		<BaseHead title={`关于 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
-	<body>
+	<body class="night-home night-inner">
 		<Header />
 		<main aria-label="关于我">
 			<!-- 个人介绍区域留空，后续在这里添加内容。 -->
@@ -18,9 +18,3 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<Footer />
 	</body>
 </html>
-
-<style>
-	main {
-		min-height: 65svh;
-	}
-</style>

@@ -10,8 +10,8 @@ export const MUSIC_FILE = 'audio/odd-dice.mp3';
 
 // 首页背景素材：填入 public 目录下的路径后会自动替换当前的渐变占位背景。
 export const HOME_ARTWORK = {
-	desktop: '/images/millsage/stellar-no-text.png',
-	mobile: '/images/millsage/stellar-no-text.png',
+	desktop: '/images/millsage/stellar-restored.png',
+	mobile: '/images/millsage/stellar-restored.png',
 };
 
 export const NAV_ITEMS = [
