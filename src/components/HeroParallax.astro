@@ -1,15 +1,20 @@
 ---
 import { HOME_ARTWORK } from '../consts';
+const layeredMedia = '(min-width: 721px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
+const emptyPixel = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 ---
 
 <hero-parallax aria-hidden="true">
-	<picture class="fallback">
-		<source media="(max-width: 720px)" srcset={HOME_ARTWORK.mobile || HOME_ARTWORK.desktop} />
-		<img src={HOME_ARTWORK.desktop} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} fetchpriority="high" />
-	</picture>
 	<div class="layers">
-		<img class="back" src={HOME_ARTWORK.background} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} />
-		<img class="character" src={HOME_ARTWORK.character} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} />
+	<picture>
+		<source media={layeredMedia} srcset={HOME_ARTWORK.background} />
+		<source media="(max-width: 720px)" srcset={HOME_ARTWORK.mobile || HOME_ARTWORK.desktop} />
+		<img class="back" src={HOME_ARTWORK.desktop} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} fetchpriority="high" />
+	</picture>
+	<picture>
+		<source media={layeredMedia} srcset={HOME_ARTWORK.character} />
+		<img class="character" src={emptyPixel} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} decoding="async" />
+	</picture>
 	</div>
 </hero-parallax>
 
@@ -74,16 +79,15 @@ import { HOME_ARTWORK } from '../consts';
 
 <style>
 	hero-parallax { position: absolute; inset: 0; z-index: -3; pointer-events: none; overflow: hidden; }
-	.fallback, .layers { position: absolute; inset: 0; }
+	.layers { position: absolute; inset: 0; }
 	img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 52% center; border-radius: 0; }
 	/* 两层使用相同画布和裁切；预留 18px 防止平移时露出边缘。 */
-	.layers { inset: -18px; visibility: hidden; }
-	.enabled .layers { visibility: visible; }
-	.enabled .fallback { visibility: hidden; }
+	@media (min-width: 721px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+		.layers { inset: -18px; }
+	}
 	.enabled .layers img { will-change: transform; }
 	@media (max-width: 720px) { img { object-position: 51% top; } }
 	@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
-		.enabled .layers { visibility: hidden; }
-		.enabled .fallback { visibility: visible; }
+		.character { display: none; }
 	}
 </style>

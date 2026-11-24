@@ -41,7 +41,7 @@ body.night-inner {
 	min-height: 100svh;
 	display: flex;
 	flex-direction: column;
-	background: linear-gradient(180deg, #08091b80, #08091bd9 70%, #08091b), url('/images/millsage/stellar-background.png') center top / cover no-repeat;
+	background: linear-gradient(180deg, #08091b80, #08091bd9 70%, #08091b), url('/images/millsage/stellar-inner.webp') center top / cover no-repeat;
 }
 body.night-inner > header { position: sticky; inset: auto; top: 0; flex-shrink: 0; }
 body.night-inner > main {
