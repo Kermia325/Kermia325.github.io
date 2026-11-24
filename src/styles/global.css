@@ -4,6 +4,17 @@
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
 
+/* Native scrollbar remains available on touch devices and without JavaScript. */
+html { scrollbar-color: #a789cc #100d25; }
+@media (min-width: 761px) and (hover: hover) and (pointer: fine) {
+	html.cookie-scroll-active { scrollbar-width: none; }
+	html.cookie-scroll-active::-webkit-scrollbar { display: none; }
+}
+@media (forced-colors: active) {
+	html.cookie-scroll-active { scrollbar-width: auto; }
+	html.cookie-scroll-active::-webkit-scrollbar { display: block; }
+}
+
 /* 首页、文章列表和关于页共用的星夜配色。 */
 body.night-home { background: #08091b; color: #e9def8; color-scheme: dark; --accent: #d3afff; --accent-dark: #f1dfff; }
 body.night-home > header { position: absolute; inset: 0 0 auto; background: transparent; }
@@ -40,10 +51,10 @@ body.night-inner > main {
 	box-sizing: border-box;
 	margin: 2rem auto;
 	padding: clamp(1.5rem, 4vw, 3rem);
-	border: 1px solid #cc9df54d;
-	background: #0b0b2133;
+	border: none;
+	background: transparent;
 }
-body.night-inner .night-content { padding: 1.5rem; background: #0c0b23c9; border-left: 2px solid #ab86c9; }
+body.night-inner .night-content { padding: 1.5rem; text-shadow: 0 2px 8px #08091b; }
 body.night-inner main h1 { color: #f3e6ff; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 500; letter-spacing: .08em; }
 body.night-inner > footer { flex-shrink: 0; background: #08091bd9; }
 @media (max-width: 720px) {

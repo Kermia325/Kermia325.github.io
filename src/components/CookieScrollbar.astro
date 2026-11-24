@@ -1,0 +1,99 @@
+<cookie-scrollbar>
+	<div class="rail">
+		<div class="track" aria-hidden="true"></div>
+		<div class="thumb" role="scrollbar" tabindex="0" aria-label="页面滚动位置" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+			<img src="/images/millsage/cookie-scroll-no-text.png" width="76" height="76" alt="" draggable="false" />
+			<span class="bubble" aria-hidden="true">小馒头饼干~</span>
+		</div>
+	</div>
+</cookie-scrollbar>
+
+<style>
+	cookie-scrollbar { display: none; }
+	@media (min-width: 761px) and (hover: hover) and (pointer: fine) {
+		cookie-scrollbar[data-ready] { display: block; position: fixed; inset: 100px 2px 28px auto; width: 76px; z-index: 20; pointer-events: none; }
+		cookie-scrollbar[data-empty] { display: none; }
+		.rail { position: relative; height: 100%; min-height: 76px; }
+		.track { position: absolute; top: 38px; bottom: 38px; right: 36px; width: 4px; border-radius: 8px; background: linear-gradient(#dcb7ff99, #8061c466, #dcb7ff99); box-shadow: 0 0 10px #b99aef55; pointer-events: auto; cursor: pointer; }
+		.thumb { position: absolute; inset: 0 0 auto; height: 76px; width: 76px; transform: translateY(var(--thumb-y, 0px)); pointer-events: auto; touch-action: none; cursor: grab; outline: none; user-select: none; }
+		.thumb:active { cursor: grabbing; }
+		.thumb img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 8px #08091b99); }
+		.thumb:focus-visible { outline: 2px solid #e5c6ff; outline-offset: 3px; border-radius: 16px; }
+		.bubble { position: absolute; right: 84px; top: 18px; white-space: nowrap; padding: 8px 14px; border: 1px solid #b994dd; border-radius: 14px 14px 3px 14px; background: #19102ff2; color: #f4e8ff; box-shadow: 0 4px 20px #0004; font-size: 14px; line-height: 1.5; opacity: 0; visibility: hidden; transform: translateX(5px); transition: opacity .18s, transform .18s, visibility .18s; pointer-events: none; }
+		.thumb:is(:hover, :focus-visible) .bubble { opacity: 1; visibility: visible; transform: translateX(0); }
+		.thumb:is(:hover, :focus-visible) img { animation: cookie-wiggle .65s ease-in-out infinite; }
+	}
+	@keyframes cookie-wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
+	@media (prefers-reduced-motion: reduce) { .thumb:is(:hover, :focus-visible) img { animation: none; } .bubble { transition: none; } }
+	@media (forced-colors: active) { cookie-scrollbar[data-ready] { display: none; } }
+</style>
+
+<script>
+	class CookieScrollbar extends HTMLElement {
+		cleanup?: () => void;
+		connectedCallback() {
+			const thumb = this.querySelector<HTMLElement>('.thumb')!;
+			const rail = this.querySelector<HTMLElement>('.rail')!;
+			const track = this.querySelector<HTMLElement>('.track')!;
+			const controller = new AbortController();
+			const { signal } = controller;
+			const root = document.documentElement;
+			const media = matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)');
+			const contrast = matchMedia('(forced-colors: active)');
+			if (!document.body.id) document.body.id = 'page-scroll-region';
+			thumb.setAttribute('aria-controls', document.body.id);
+			let frame = 0;
+			let drag: { id: number; offset: number } | undefined;
+			const maxScroll = () => Math.max(0, root.scrollHeight - root.clientHeight);
+			const travel = () => Math.max(0, rail.clientHeight - thumb.offsetHeight);
+			const update = () => {
+				frame = 0;
+				const max = maxScroll();
+				const active = media.matches && !contrast.matches && max > 0;
+				root.classList.toggle('cookie-scroll-active', active);
+				this.toggleAttribute('data-empty', max <= 0);
+				const progress = max ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+				thumb.style.setProperty('--thumb-y', `${progress * travel()}px`);
+				thumb.setAttribute('aria-valuenow', String(Math.round(progress * 100)));
+				thumb.setAttribute('aria-valuetext', `已滚动 ${Math.round(progress * 100)}%`);
+			};
+			const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+			const scrollToPointer = (y: number, offset: number) => {
+				const ratio = (y - rail.getBoundingClientRect().top - offset) / Math.max(1, travel());
+				window.scrollTo({ top: Math.min(1, Math.max(0, ratio)) * maxScroll(), behavior: 'instant' });
+			};
+			thumb.addEventListener('pointerdown', (e) => {
+				if (e.button !== 0) return;
+				e.preventDefault();
+				thumb.focus({ preventScroll: true });
+				drag = { id: e.pointerId, offset: e.clientY - thumb.getBoundingClientRect().top };
+				thumb.setPointerCapture(e.pointerId);
+			}, { signal });
+			thumb.addEventListener('pointermove', (e) => { if (drag?.id === e.pointerId) scrollToPointer(e.clientY, drag.offset); }, { signal });
+			const stop = () => { drag = undefined; };
+			thumb.addEventListener('pointerup', stop, { signal });
+			thumb.addEventListener('pointercancel', stop, { signal });
+			thumb.addEventListener('lostpointercapture', stop, { signal });
+			track.addEventListener('pointerdown', (e) => { if (e.button === 0) scrollToPointer(e.clientY, thumb.offsetHeight / 2); }, { signal });
+			thumb.addEventListener('keydown', (e) => {
+				const step = window.innerHeight * .85;
+				const positions: Record<string, number> = { ArrowDown: scrollY + 60, ArrowUp: scrollY - 60, PageDown: scrollY + step, PageUp: scrollY - step, Home: 0, End: maxScroll() };
+				if (!(e.key in positions)) return;
+				e.preventDefault();
+				window.scrollTo({ top: positions[e.key], behavior: 'instant' });
+			}, { signal });
+			window.addEventListener('scroll', schedule, { passive: true, signal });
+			window.addEventListener('resize', schedule, { signal });
+			media.addEventListener('change', schedule, { signal });
+			contrast.addEventListener('change', schedule, { signal });
+			document.addEventListener('astro:page-load', schedule, { signal });
+			const observer = new ResizeObserver(schedule);
+			observer.observe(document.body);
+			this.setAttribute('data-ready', '');
+			schedule();
+			this.cleanup = () => { controller.abort(); observer.disconnect(); cancelAnimationFrame(frame); root.classList.remove('cookie-scroll-active'); };
+		}
+		disconnectedCallback() { this.cleanup?.(); }
+	}
+	if (!customElements.get('cookie-scrollbar')) customElements.define('cookie-scrollbar', CookieScrollbar);
+</script>

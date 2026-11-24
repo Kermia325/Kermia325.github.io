@@ -2,7 +2,11 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { getCollection } from 'astro:content';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+const posts = (await getCollection('blog', ({ data }) => data.published))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
@@ -15,7 +19,14 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 		<main class="notes-page">
 			<div class="night-content">
 			<h1>文章</h1>
-			<p class="empty-state">暂时还没有文章，之后会在这里分享学习、技术探索与日常记录。</p>
+			{posts.length ? posts.map((post) => (
+				<article class="post-preview">
+					<FormattedDate date={post.data.pubDate} />
+					<h2><a href={`/blog/${post.id}/`}>{post.data.title}</a></h2>
+					<p>{post.data.description}</p>
+					<a href={`/blog/${post.id}/`}>阅读全文 →</a>
+				</article>
+			)) : <p class="empty-state">暂时还没有文章，之后会在这里分享学习、技术探索与日常记录。</p>}
 			</div>
 		</main>
 		<Footer />
@@ -23,6 +34,11 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 </html>
 
 <style>
+	.post-preview { padding: 1.5rem 0; max-width: 48rem; }
+	.post-preview h2 { font-size: 1.6rem; line-height: 1.5; margin: .5rem 0; }
+	.post-preview a { color: #e4cbff; text-decoration: none; }
+	.post-preview a:hover { text-decoration: underline; }
+	.post-preview p { color: #d3c6e6; }
 	.empty-state {
 		max-width: 36rem;
 		color: #d3c6e6;
