@@ -5,11 +5,11 @@ import { HOME_ARTWORK } from '../consts';
 <hero-parallax aria-hidden="true">
 	<picture class="fallback">
 		<source media="(max-width: 720px)" srcset={HOME_ARTWORK.mobile || HOME_ARTWORK.desktop} />
-		<img src={HOME_ARTWORK.desktop} alt="" width="1672" height="941" fetchpriority="high" />
+		<img src={HOME_ARTWORK.desktop} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} fetchpriority="high" />
 	</picture>
 	<div class="layers">
-		<img class="back" src="/images/millsage/stellar-background.png" alt="" width="1672" height="941" />
-		<img class="character" src="/images/millsage/stellar-character-original.png" alt="" width="1672" height="941" />
+		<img class="back" src={HOME_ARTWORK.background} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} />
+		<img class="character" src={HOME_ARTWORK.character} alt="" width={HOME_ARTWORK.width} height={HOME_ARTWORK.height} />
 	</div>
 </hero-parallax>
 
