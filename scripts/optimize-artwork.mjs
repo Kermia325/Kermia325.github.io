@@ -18,3 +18,10 @@ for (const [input, output, width, quality] of jobs) {
     .toFile(path.join(root, output));
   console.log(`${output}: ${result.width}x${result.height}, ${result.size} bytes`);
 }
+
+// Keep the same mobile canvas/crop; offer AVIF before the existing WebP fallback.
+const mobile = await sharp(path.join(root, 'stellar-hd-source.png'))
+  .resize({ width: 1200, withoutEnlargement: true })
+  .avif({ quality: 60, effort: 7, chromaSubsampling: '4:4:4' })
+  .toFile(path.join(root, 'stellar-mobile.avif'));
+console.log(`stellar-mobile.avif: ${mobile.width}x${mobile.height}, ${mobile.size} bytes`);

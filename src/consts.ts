@@ -12,6 +12,7 @@ export const MUSIC_FILE = 'audio/odd-dice.mp3';
 export const HOME_ARTWORK = {
 	desktop: '/images/millsage/stellar-static.webp',
 	mobile: '/images/millsage/stellar-mobile.webp',
+	mobileAvif: '/images/millsage/stellar-mobile.avif',
 	background: '/images/millsage/stellar-parallax-background.webp',
 	character: '/images/millsage/stellar-parallax-character.webp',
 	width: 1920,
